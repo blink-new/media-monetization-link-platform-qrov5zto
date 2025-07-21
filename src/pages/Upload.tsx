@@ -150,7 +150,7 @@ export function Upload() {
         description,
         price: parseFloat(price),
         currency,
-        contentUrls: uploadedUrls,
+        contentUrls: JSON.stringify(uploadedUrls),
         shareLink,
         userId: (await blink.auth.me()).id,
         type: uploadedFiles[0]?.type || 'text',

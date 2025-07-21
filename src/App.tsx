@@ -70,22 +70,23 @@ function HomePage() {
       
       // Create content record in database
       const contentId = `content_${Date.now()}`
-      await blink.db.content_items.create({
+      const shareLink = `${window.location.origin}/pay/${contentId}`
+      await blink.db.contentItems.create({
         id: contentId,
-        user_id: user.id,
+        userId: user.id,
         title: files.map(f => f.name).join(', '),
         type: 'files',
-        files: JSON.stringify(uploadedFiles),
+        contentUrls: JSON.stringify(uploadedFiles),
+        shareLink: shareLink,
         price: parseFloat(price),
         currency: currency,
-        created_at: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
         views: 0,
         earnings: 0
       })
       
-      // Generate shareable link
-      const link = `${window.location.origin}/pay/${contentId}`
-      setShareLink(link)
+      // Set the generated link
+      setShareLink(shareLink)
       
     } catch (error) {
       console.error('Upload failed:', error)

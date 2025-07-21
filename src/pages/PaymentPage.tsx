@@ -22,7 +22,7 @@ export default function PaymentPage() {
 
   const loadContent = useCallback(async () => {
     try {
-      const contentData = await blink.db.content_items.list({
+      const contentData = await blink.db.contentItems.list({
         where: { id: contentId },
         limit: 1
       })
@@ -30,7 +30,7 @@ export default function PaymentPage() {
       if (contentData.length > 0) {
         setContent(contentData[0])
         // Increment view count
-        await blink.db.content_items.update(contentId, {
+        await blink.db.contentItems.update(contentId, {
           views: (contentData[0].views || 0) + 1
         })
       }
@@ -59,16 +59,16 @@ export default function PaymentPage() {
       // Record payment
       await blink.db.payments.create({
         id: `payment_${Date.now()}`,
-        content_id: contentId,
-        user_email: email,
+        contentId: contentId,
+        buyerEmail: email,
         amount: content.price,
         currency: content.currency,
-        status: 'completed',
-        created_at: new Date().toISOString()
+        paymentStatus: 'completed',
+        createdAt: new Date().toISOString()
       })
       
       // Update content earnings
-      await blink.db.content_items.update(contentId, {
+      await blink.db.contentItems.update(contentId, {
         earnings: (content.earnings || 0) + content.price
       })
       
@@ -85,7 +85,7 @@ export default function PaymentPage() {
     if (!content || !paid) return
     
     try {
-      const files = JSON.parse(content.files)
+      const files = JSON.parse(content.contentUrls)
       files.forEach((file, index) => {
         setTimeout(() => {
           const link = document.createElement('a')
@@ -142,7 +142,7 @@ export default function PaymentPage() {
           <div className="bg-slate-50 p-6 rounded-xl mb-8">
             <h3 className="font-semibold text-slate-900 mb-3">{content.title}</h3>
             <p className="text-sm text-slate-600 mb-4">
-              {JSON.parse(content.files).length} file(s) • 
+              {JSON.parse(content.contentUrls).length} file(s) • 
               Paid {content.price} {content.currency}
             </p>
           </div>
@@ -179,12 +179,12 @@ export default function PaymentPage() {
         <div className="bg-slate-50 p-6 rounded-xl mb-8">
           <h3 className="font-bold text-slate-900 mb-3">{content.title}</h3>
           <div className="flex items-center justify-between text-sm text-slate-600 mb-4">
-            <span>{JSON.parse(content.files).length} file(s)</span>
+            <span>{JSON.parse(content.contentUrls).length} file(s)</span>
             <span>{content.views || 0} views</span>
           </div>
           
           <div className="space-y-2">
-            {JSON.parse(content.files).map((file, index) => (
+            {JSON.parse(content.contentUrls).map((file, index) => (
               <div key={index} className="flex items-center justify-between bg-white rounded-lg p-3">
                 <span className="font-medium text-slate-700 truncate">{file.name}</span>
                 <span className="text-xs text-slate-500 ml-2">
